@@ -23,11 +23,81 @@ To Implement ELLIPTIC CURVE CRYPTOGRAPHY(ECC)
 5. Security: ECC’s security relies on the Elliptic Curve Discrete Logarithm Problem (ECDLP), making it highly secure with shorter key lengths compared to traditional methods like RSA.
 
 ## Program:
+~~~
+#include <stdio.h>
+struct Point
+{
+    int x;
+    int y;
+};
+int inverse(int a, int p){
+    a = (a % p + p) % p;
+    for(int i = 1; i < p; i++){
+        if((a * i) % p == 1)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+struct Point add(struct Point P, struct Point Q, int a, int p)
+{
+    struct Point R;
+    int l;
+    if(P.x == Q.x && P.y == Q.y){
+        l = ((3 * P.x * P.x + a) * inverse(2 * P.y, p)) % p;
+    }
+    else{
+        l = ((Q.y - P.y) * inverse(Q.x - P.x, p)) % p;
+    }
+    l = (l % p + p) % p;
+    R.x = (l * l - P.x - Q.x) % p;
+    R.y = (l * (P.x - R.x) - P.y) % p;
+    R.x = (R.x % p + p) % p;
+    R.y = (R.y % p + p) % p;
+    return R;
+}
+struct Point multiply(struct Point P, int k, int a, int p)
+{
+    struct Point R = P;
+    for(int i = 0; i < k - 1; i++){
+        R = add(R, P, a, p);
+    }
+    return R;
+}
+int main(){
+    int p, a;
+    int gx, gy;
+    int RahulVijay, V;
+    struct Point G, pubRahulVijay, pubV;
+    struct Point secret1, secret2;
+    printf("ECC Key Exchange\n");
+    printf("Enter prime number: ");
+    scanf("%d", &p);
+    printf("Enter value of a: ");
+    scanf("%d", &a);
+    printf("Enter Gx: ");
+    scanf("%d", &gx);
+    printf("Enter Gy: ");
+    scanf("%d", &gy);
+    printf("Enter Swetha Private key: ");
+    scanf("%d", &RahulVijay);
+    printf("Enter V private key: ");
+    scanf("%d", &V);
+    G.x = gx;
+    G.y = gy;
+    pubRahulVijay = multiply(G, RahulVijay, a, p);
+    pubV = multiply(G, V, a, p);
+    secret1 = multiply(pubV, RahulVijay, a, p);
+    secret2 = multiply(pubRahulVijay, V, a, p);
+    printf(",Shared Secret by Swetha: %d %d" ,secret1.x, secret1.y);
+    printf("Shared Secret by V: (%d, %d)\n", secret2.x, secret2.y);
 
-
-
+    return 0;
+}
+~~~
 ## Output:
-
+<img width="1572" height="677" alt="image" src="https://github.com/user-attachments/assets/4457e416-21f7-491d-8384-22f902167d3f" />
 
 ## Result:
 The program is executed successfully
